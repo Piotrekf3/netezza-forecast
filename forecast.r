@@ -1,17 +1,14 @@
-library(timetk)
-library(tidyverse)
-library(forecast)
-library(zoo)
-
 nz.fun <- function() {
-  data <- list()
   while(getNext()) {
-    input <- getInputColumn(0)
-    data <- list(input)
+    model <- readRDS('/nz/export/ae/applications/modelBayes.rds')
+    
+    daylength <- getInputColumn(0)
+    season <- getInputColumn(1)
+    
+    data <- data.frame(V3 = daylength, V4 = season)
+    fcast <- predict(model, data)
+	
+    setOutputString(0, fcast)
+	  outputResult()
   }
-  data.ts<- ts(data, frequency=365)
-  
-  fit <- auto.arima(data.ts, D=1)
-  fcast <- forecast(fit, h = 100)
-
 }
